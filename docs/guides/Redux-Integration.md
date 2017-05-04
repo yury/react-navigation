@@ -9,9 +9,13 @@ import { addNavigationHelpers } from 'react-navigation';
 
 const AppNavigator = StackNavigator(AppRouteConfigs);
 
-const navReducer = (state, action) => {
-  const newState = AppNavigator.router.getStateForAction(action, state);
-  return newState || state;
+const initialState = AppNavigator.router.getStateForAction(AppNavigator.router.getActionForPathAndParams('Login'));
+
+const navReducer = (state = initialState, action) => {
+  const nextState = AppNavigator.router.getStateForAction(action, state);
+
+  // Simply return the original `state` if `nextState` is null or undefined.
+  return nextState || state;
 };
 
 const appReducer = combineReducers({
@@ -19,10 +23,7 @@ const appReducer = combineReducers({
   ...
 });
 
-@connect(state => ({
-  nav: state.nav,
-}))
-class AppWithNavigationState extends React.Component {
+class App extends React.Component {
   render() {
     return (
       <AppNavigator navigation={addNavigationHelpers({
@@ -33,9 +34,15 @@ class AppWithNavigationState extends React.Component {
   }
 }
 
+const mapStateToProps = (state) => ({
+  nav: state.nav
+});
+
+const AppWithNavigationState = connect(mapStateToProps)(App);
+
 const store = createStore(appReducer);
 
-class App extends React.Component {
+class Root extends React.Component {
   render() {
     return (
       <Provider store={store}>
@@ -61,3 +68,20 @@ const AppNavigator = StackNavigator({
 ```
 
 In this case, once you `connect` `AppNavigator` to Redux as is done in `AppWithNavigationState`, `MyTabNavigator` will automatically have access to navigation state as a `navigation` prop.
+
+## Full example
+
+There's a working example app with redux [here](https://github.com/react-community/react-navigation/tree/master/examples/ReduxExample) if you want to try it out yourself.
+
+## Mocking tests
+
+To make jest tests work with your react-navigation app, you need to change the jest preset in the `package.json`, see [here](https://facebook.github.io/jest/docs/tutorial-react-native.html#transformignorepatterns-customization):
+
+```
+"jest": {
+  "preset": "react-native",
+  "transformIgnorePatterns": [
+    "node_modules/(?!(jest-)?react-native|react-navigation)"
+  ]
+}
+```
