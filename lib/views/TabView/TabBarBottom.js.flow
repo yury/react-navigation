@@ -1,12 +1,7 @@
 /* @flow */
 
 import React, { PureComponent } from 'react';
-import {
-  Animated,
-  View,
-  TouchableWithoutFeedback,
-  StyleSheet,
-} from 'react-native';
+import { Animated, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import TabBarIcon from './TabBarIcon';
 
 import type {
@@ -143,7 +138,7 @@ export default class TabBarBottom
     // Prepend '-1', so there are always at least 2 items in inputRange
     const inputRange = [-1, ...routes.map((x: *, i: number) => i)];
     return (
-      <View style={[styles.tabBar, style]}>
+      <Animated.View style={[styles.tabBar, style]}>
         {routes.map((route: NavigationRoute, index: number) => {
           const focused = index === navigation.state.index;
           const scene = { route, index, focused };
@@ -172,7 +167,7 @@ export default class TabBarBottom
             </TouchableWithoutFeedback>
           );
         })}
-      </View>
+      </Animated.View>
     );
   }
 }
